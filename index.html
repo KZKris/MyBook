@@ -105,11 +105,15 @@
     let last = null;
 
     function resizeCanvas() {
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 60;
-      ctx.putImageData(imageData, 0, 0);
+      let tempImage = new Image();
+      tempImage.src = canvas.toDataURL();
+      tempImage.onload = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight - 60;
+        ctx.drawImage(tempImage, 0, 0, canvas.width, canvas.height);
+      }
     }
+
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
@@ -220,10 +224,15 @@
     }
 
     function requestFullscreen() {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
+      const el = document.documentElement;
+      if (!document.fullscreenElement) {
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen) el.msRequestFullscreen();
       } else {
-        document.documentElement.requestFullscreen();
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
       }
     }
 
